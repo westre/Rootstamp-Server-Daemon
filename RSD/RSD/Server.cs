@@ -14,6 +14,7 @@ namespace RSD {
         private MainForm form;
         private SocketListener socketListener;
         private Database database;
+        private RegistrationAutomation registrationAutomation;
 
         private static List<GameServer> gameServers;
 
@@ -24,6 +25,8 @@ namespace RSD {
 
             gameServers = database.GetAllGameServers();
             LinkProcesses(gameServers);
+
+            registrationAutomation = new RegistrationAutomation(this);
 
             form.InitializeGameServerPanel(gameServers);
 
@@ -49,14 +52,19 @@ namespace RSD {
                 GameServer gameServer = Find(serverId);
 
                 if (gameServer != null) {
-                    if (gameServer.IsActive()) {
-                        form.ServerOutput(gameServer, "Server is online");
-                        message += "Server is online";
+                    try {
+                        if (gameServer.IsActive()) {
+                            form.ServerOutput(gameServer, "Server is online");
+                            message += "Server is online";
+                        }
+                        else {
+                            form.ServerOutput(gameServer, "Server is offline");
+                            message += "Server is offline";
+                        }
                     }
-                    else {
-                        form.ServerOutput(gameServer, "Server is offline");
-                        message += "Server is offline";
-                    }
+                    catch(Exception ex) {
+                        form.Error("FATAL ERROR:: Could not execute server_status: " + ex);
+                    }                  
                 }
                 else {
                     form.Error("Server_status: Could not find id " + jsonObject.server_start.id);
@@ -69,14 +77,19 @@ namespace RSD {
 
                 if (gameServer != null) {
                     List<string> messages;
-                    if(gameServer.Start(out messages)) {
-                        form.ServerOutput(gameServer, "Started server: " + string.Join(",", messages.ToArray()));
-                        message += "Started server: " + string.Join(",", messages.ToArray());
+                    try {
+                        if (gameServer.Start(out messages)) {
+                            form.ServerOutput(gameServer, "Started server: " + string.Join(",", messages.ToArray()));
+                            message += "Started server: " + string.Join(",", messages.ToArray());
+                        }
+                        else {
+                            form.ServerOutput(gameServer, "Could not start server: " + string.Join(",", messages.ToArray()));
+                            message += "Could not start server: " + string.Join(",", messages.ToArray());
+                        }
                     }
-                    else {
-                        form.ServerOutput(gameServer, "Could not start server: " + string.Join(",", messages.ToArray()));
-                        message += "Could not start server: " + string.Join(",", messages.ToArray());
-                    }
+                    catch (Exception ex) {
+                        form.Error("FATAL ERROR:: Could not execute server_stats: " + ex);
+                    }    
                 }
                 else {
                     form.Error("Server_start: Could not find id " + jsonObject.server_start.id);
@@ -89,14 +102,19 @@ namespace RSD {
 
                 if (gameServer != null) {
                     List<string> messages;
-                    if (gameServer.Stop(out messages)) {
-                        form.ServerOutput(gameServer, "Stopped server: " + string.Join(",", messages.ToArray()));
-                        message += "Stopped server: " + string.Join(",", messages.ToArray());
+                    try {
+                        if (gameServer.Stop(out messages)) {
+                            form.ServerOutput(gameServer, "Stopped server: " + string.Join(",", messages.ToArray()));
+                            message += "Stopped server: " + string.Join(",", messages.ToArray());
+                        }
+                        else {
+                            form.ServerOutput(gameServer, "Could not stop server: " + string.Join(",", messages.ToArray()));
+                            message += "Could not stop server: " + string.Join(",", messages.ToArray());
+                        }
                     }
-                    else {
-                        form.ServerOutput(gameServer, "Could not stop server: " + string.Join(",", messages.ToArray()));
-                        message += "Could not stop server: " + string.Join(",", messages.ToArray());
-                    }
+                    catch (Exception ex) {
+                        form.Error("FATAL ERROR:: Could not execute server_stop: " + ex);
+                    }    
                 }
                 else {
                     form.Error("Server_stop: Could not find id " + jsonObject.server_start.id);
@@ -109,13 +127,18 @@ namespace RSD {
 
                 if (gameServer != null) {
                     List<string> messages;
-                    if (gameServer.Reinstall(out messages)) {
-                        form.ServerOutput(gameServer, "Reinstalled server: " + string.Join(",", messages.ToArray()));
-                        message += "Reinstalled server: " + string.Join(",", messages.ToArray());
+                    try {
+                        if (gameServer.Reinstall(out messages)) {
+                            form.ServerOutput(gameServer, "Reinstalled server: " + string.Join(",", messages.ToArray()));
+                            message += "Reinstalled server: " + string.Join(",", messages.ToArray());
+                        }
+                        else {
+                            form.ServerOutput(gameServer, "Could not reinstall server: " + string.Join(",", messages.ToArray()));
+                            message += "Could not reinstall server: " + string.Join(",", messages.ToArray());
+                        }
                     }
-                    else {
-                        form.ServerOutput(gameServer, "Could not reinstall server: " + string.Join(",", messages.ToArray()));
-                        message += "Could not reinstall server: " + string.Join(",", messages.ToArray());
+                    catch (Exception ex) {
+                        form.Error("FATAL ERROR:: Could not execute server_reinstall: " + ex);
                     }
                 }
                 else {
@@ -129,13 +152,18 @@ namespace RSD {
 
                 if (gameServer != null) {
                     List<string> messages;
-                    if (gameServer.GenerateFTP(out messages)) {
-                        form.ServerOutput(gameServer, "Generated FTP: " + string.Join(",", messages.ToArray()));
-                        message += "Generated FTP: " + string.Join(",", messages.ToArray());
+                    try {
+                        if (gameServer.GenerateFTP(out messages)) {
+                            form.ServerOutput(gameServer, "Generated FTP: " + string.Join(",", messages.ToArray()));
+                            message += "Generated FTP: " + string.Join(",", messages.ToArray());
+                        }
+                        else {
+                            form.ServerOutput(gameServer, "Could not generate FTP: " + string.Join(",", messages.ToArray()));
+                            message += "Could not generate FTP: " + string.Join(",", messages.ToArray());
+                        }
                     }
-                    else {
-                        form.ServerOutput(gameServer, "Could not generate FTP: " + string.Join(",", messages.ToArray()));
-                        message += "Could not generate FTP: " + string.Join(",", messages.ToArray());
+                    catch (Exception ex) {
+                        form.Error("FATAL ERROR:: Could not execute ftp_generate: " + ex);
                     }
                 }
                 else {
@@ -175,6 +203,10 @@ namespace RSD {
                 }
                 catch (Exception ex) { }
             }
+        }
+
+        public Database Database {
+            get { return database; }
         }
 
         public MainForm Form {
