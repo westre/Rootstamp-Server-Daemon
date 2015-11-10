@@ -171,6 +171,27 @@ namespace RSD {
                     message += "Ftp_generate: Could not find id " + jsonObject.server_start.id;
                 }
             }
+            else if (jsonObject.set_server_package != null) {
+                int serverId = jsonObject.server_reinstall.id;
+                int packageId = jsonObject.server_reinstall.packageId;
+                GameServer gameServer = Find(serverId);
+
+                if (gameServer != null) {
+                    List<string> messages = new List<string>();
+
+                    if(gameServer is SAMPServer) {
+                        SAMPServer sampServer = (SAMPServer)gameServer;
+                        sampServer.PackageId = packageId;
+
+                        form.ServerOutput(gameServer, "Set to packageId: " + sampServer.PackageId);
+                        message += "Set to packageId: " + sampServer.PackageId;
+                    }
+                }
+                else {
+                    form.Error("Set_server_package: Could not find id " + jsonObject.server_start.id);
+                    message += "Set_server_package: Could not find id " + jsonObject.server_start.id;
+                }
+            }
 
             return message;
         }
