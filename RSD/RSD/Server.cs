@@ -42,6 +42,9 @@ namespace RSD {
             string appendMessage = ProcessRequest(jsonObject);
 
             socketListener.Finalize(tcpClient, message + "<br/>" + appendMessage);
+
+            // Refresh
+            //form.InitializeGameServerPanel(gameServers);
         }
 
         private string ProcessRequest(dynamic jsonObject) {
