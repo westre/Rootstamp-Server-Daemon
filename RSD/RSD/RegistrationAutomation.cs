@@ -25,9 +25,14 @@ namespace RSD {
         }
 
         private void OnRegistrationTimer(object source, ElapsedEventArgs e) {
-            CheckTerminations();
-            CheckActivations();
-            CheckPremiumExpiredServers();
+            try {
+                CheckTerminations();
+                CheckActivations();
+                CheckPremiumExpiredServers();
+            }
+            catch (Exception ex) {
+                server.Form.Output(ex.Message);
+            }            
         }
 
         private void CheckPremiumExpiredServers() {
@@ -47,7 +52,7 @@ namespace RSD {
                     WebResponse webResponse = webRequest.GetResponse();
                     webResponse.Close();
                 }
-                catch (Exception ex) {
+                catch (Exception) {
 
                 }
 
@@ -70,7 +75,7 @@ namespace RSD {
                     WebResponse webResponse = webRequest.GetResponse();
                     webResponse.Close();
                 }
-                catch (Exception ex) {
+                catch (Exception) {
 
                 }
 
@@ -96,7 +101,7 @@ namespace RSD {
                     WebResponse webResponse = webRequest.GetResponse();
                     webResponse.Close();
                 }
-                catch (Exception ex) {
+                catch (Exception) {
 
                 }
 

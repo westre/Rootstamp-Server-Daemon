@@ -36,13 +36,18 @@ namespace RSD {
         }
 
         public void OnMessageReceive(SocketListener socketListener, TcpClient tcpClient, string message) {
-            form.Output("OnMessageReceive: " + message);
+            try {
+                form.Output("OnMessageReceive: " + message);
 
-            dynamic jsonObject = JsonConvert.DeserializeObject(message);
-            string appendMessage = ProcessRequest(jsonObject);
+                dynamic jsonObject = JsonConvert.DeserializeObject(message);
+                string appendMessage = ProcessRequest(jsonObject);
 
-            socketListener.Finalize(tcpClient, message + "<br/>" + appendMessage);
-
+                socketListener.Finalize(tcpClient, message + "<br/>" + appendMessage);
+            }
+            catch(Exception ex) {
+                form.Error("OnMessageReceive:: " + ex.ToString());
+            }
+            
             // Refresh
             //form.InitializeGameServerPanel(gameServers);
         }
@@ -175,14 +180,12 @@ namespace RSD {
                 }
             }
             else if (jsonObject.set_server_package != null) {
-                int serverId = jsonObject.server_reinstall.id;
-                int packageId = jsonObject.server_reinstall.packageId;
+                int serverId = jsonObject.set_server_package.id;
+                int packageId = jsonObject.set_server_package.packageId;
                 GameServer gameServer = Find(serverId);
 
                 if (gameServer != null) {
-                    List<string> messages = new List<string>();
-
-                    if(gameServer is SAMPServer) {
+                    if (gameServer is SAMPServer) {
                         SAMPServer sampServer = (SAMPServer)gameServer;
                         sampServer.PackageId = packageId;
 
@@ -225,7 +228,7 @@ namespace RSD {
                         }
                     }
                 }
-                catch (Exception ex) { }
+                catch (Exception) { }
             }
         }
 
