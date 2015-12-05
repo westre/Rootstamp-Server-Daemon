@@ -8,6 +8,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
+using System.Windows.Forms;
 
 namespace RSD {
     class Server {
@@ -30,13 +32,30 @@ namespace RSD {
 
             form.InitializeGameServerPanel(gameServers);
 
-            socketListener = new SocketListener(this, 33334); // 33333
+            socketListener = new SocketListener(this, 33333); // 33333
             socketListener.SocketMessageReceived += OnMessageReceive;
-            form.Output("SocketListener initialized");
         }
 
         private void OnPerformanceTick(GameServer server, double ram, double cpu) {
-            form.Output("Server " + server.Id + ", RAM (MB): " + ram + ", CPU: " + cpu);
+            if(ram >= 200) {
+                server.PerformanceWarnings.Add("RAM usage too high: " + ram + " MB");
+                form.errorLog.Items.Add("RAM usage too high, Server " + server.Id + ", RAM (MB): " + ram + ", CPU: " + cpu);
+            }
+
+            if (cpu >= 10) {
+                server.PerformanceWarnings.Add("CPU usage too high: " + cpu + " %");
+                form.errorLog.Items.Add("CPU usage too high, Server " + server.Id + ", RAM (MB): " + ram + ", CPU: " + cpu);
+            }
+
+            if(server.PerformanceWarnings.Count > 100) {
+                List<string> messages;
+                try {
+                    if (server.Stop(out messages)) {
+                        form.errorLog.Items.Add("PerformanceWarnings OVER 100:: Stopped server: " + string.Join(",", messages.ToArray()));
+                    }
+                }
+                catch (Exception) { }
+            }
         }
 
         public void OnMessageReceive(SocketListener socketListener, TcpClient tcpClient, string message) {

@@ -29,6 +29,8 @@ namespace RSD {
         public delegate void OnPerformanceUpdate(GameServer server, double ram, double cpu);
         public event OnPerformanceUpdate OnPerformanceTick;
 
+        private List<string> performanceWarnings;
+
         public GameServer(int id, int port, string path, string executeable, FTPData ftpData) {
             this.id = id;
             this.port = port;
@@ -39,6 +41,8 @@ namespace RSD {
             performanceThread = new Thread(new ThreadStart(PerformanceListener));
             performanceThread.IsBackground = true;
             performanceThread.Start();
+
+            performanceWarnings = new List<string>();
         }
 
         private void PerformanceListener() {
@@ -68,6 +72,11 @@ namespace RSD {
         public int Port {
             get { return port; }
             set { port = value; }
+        }
+
+        public List<string> PerformanceWarnings {
+            get { return performanceWarnings; }
+            set { performanceWarnings = value; }
         }
 
         public string GamePath {
@@ -145,6 +154,7 @@ namespace RSD {
             if(process.Start()) {
                 ramCounter = new PerformanceCounter("Process", "Working Set", Process.ProcessName);
                 cpuCounter = new PerformanceCounter("Process", "% Processor Time", Process.ProcessName);
+                performanceWarnings = new List<string>();
 
                 return true;
             }
