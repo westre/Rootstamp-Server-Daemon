@@ -30,9 +30,13 @@ namespace RSD {
 
             form.InitializeGameServerPanel(gameServers);
 
-            socketListener = new SocketListener(this, 33333);
+            socketListener = new SocketListener(this, 33334); // 33333
             socketListener.SocketMessageReceived += OnMessageReceive;
             form.Output("SocketListener initialized");
+        }
+
+        private void OnPerformanceTick(GameServer server, double ram, double cpu) {
+            form.Output("Server " + server.Id + ", RAM (MB): " + ram + ", CPU: " + cpu);
         }
 
         public void OnMessageReceive(SocketListener socketListener, TcpClient tcpClient, string message) {
@@ -224,6 +228,11 @@ namespace RSD {
                     foreach(GameServer gameServer in gameServers) {
                         if(gameServer.GamePath + gameServer.Executeable == fullProcessPath) {
                             gameServer.Process = process;
+
+                            gameServer.RamCounter = new PerformanceCounter("Process", "Working Set", Utility.GetProcessInstanceName(gameServer.Process.Id));
+                            gameServer.CpuCounter = new PerformanceCounter("Process", "% Processor Time", Utility.GetProcessInstanceName(gameServer.Process.Id));
+                            gameServer.OnPerformanceTick += OnPerformanceTick;
+
                             form.Output("Found a link ID: " + gameServer.Id);
                         }
                     }

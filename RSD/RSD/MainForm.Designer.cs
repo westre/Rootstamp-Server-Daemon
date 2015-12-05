@@ -25,6 +25,7 @@
         private void InitializeComponent() {
             this.messageLog = new System.Windows.Forms.ListBox();
             this.gameServerPanel = new System.Windows.Forms.Panel();
+            this.errorLog = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
             // 
             // messageLog
@@ -42,11 +43,20 @@
             this.gameServerPanel.Size = new System.Drawing.Size(200, 329);
             this.gameServerPanel.TabIndex = 1;
             // 
+            // errorLog
+            // 
+            this.errorLog.FormattingEnabled = true;
+            this.errorLog.Location = new System.Drawing.Point(578, 13);
+            this.errorLog.Name = "errorLog";
+            this.errorLog.Size = new System.Drawing.Size(439, 329);
+            this.errorLog.TabIndex = 2;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(589, 361);
+            this.ClientSize = new System.Drawing.Size(1029, 361);
+            this.Controls.Add(this.errorLog);
             this.Controls.Add(this.gameServerPanel);
             this.Controls.Add(this.messageLog);
             this.Name = "MainForm";
@@ -59,6 +69,7 @@
 
         private System.Windows.Forms.ListBox messageLog;
         private System.Windows.Forms.Panel gameServerPanel;
+        public System.Windows.Forms.ListBox errorLog;
     }
 }
 
