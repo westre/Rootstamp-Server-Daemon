@@ -17,8 +17,9 @@ namespace RSD {
         private SocketListener socketListener;
         private Database database;
         private RegistrationAutomation registrationAutomation;
+        private PerformanceMonitor performanceMonitor;
 
-        private static List<GameServer> gameServers;
+        public static List<GameServer> gameServers;
 
         public Server(MainForm form) {
             this.form = form;
@@ -34,6 +35,9 @@ namespace RSD {
 
             socketListener = new SocketListener(this, 33333); // 33333
             socketListener.SocketMessageReceived += OnMessageReceive;
+
+            performanceMonitor = new PerformanceMonitor();
+            performanceMonitor.OnPerformanceTick += OnPerformanceTick;
         }
 
         private void OnPerformanceTick(GameServer server, double ram, double cpu) {
@@ -250,7 +254,6 @@ namespace RSD {
 
                             gameServer.RamCounter = new PerformanceCounter("Process", "Working Set", Utility.GetProcessInstanceName(gameServer.Process.Id));
                             gameServer.CpuCounter = new PerformanceCounter("Process", "% Processor Time", Utility.GetProcessInstanceName(gameServer.Process.Id));
-                            gameServer.OnPerformanceTick += OnPerformanceTick;
 
                             form.Output("Found a link ID: " + gameServer.Id);
                         }

@@ -22,12 +22,8 @@ namespace RSD {
         public abstract bool Start(out List<string> messages);
         public abstract bool Stop(out List<string> messages);
 
-        private Thread performanceThread;
         private PerformanceCounter ramCounter;
         private PerformanceCounter cpuCounter;
-
-        public delegate void OnPerformanceUpdate(GameServer server, double ram, double cpu);
-        public event OnPerformanceUpdate OnPerformanceTick;
 
         private List<string> performanceWarnings;
 
@@ -38,30 +34,7 @@ namespace RSD {
             this.executeable = executeable;
             this.ftpData = ftpData;
 
-            performanceThread = new Thread(new ThreadStart(PerformanceListener));
-            performanceThread.IsBackground = true;
-            performanceThread.Start();
-
             performanceWarnings = new List<string>();
-        }
-
-        private void PerformanceListener() {
-            while (true) {
-                try {
-                    Thread.Sleep(1000);
-
-                    if (IsActive() && ramCounter != null && cpuCounter != null) {
-                        double ram = ramCounter.NextValue();
-                        double cpu = cpuCounter.NextValue();
-                        //Console.WriteLine("RAM: " + (ram / 1024 / 1024) + " MB; CPU: " + (cpu) + " %");
-
-                        if (OnPerformanceTick != null) {
-                            OnPerformanceTick(this, (ram / 1024 / 1024), cpu);
-                        }
-                    }
-                }
-                catch(Exception) { } 
-            }
         }
 
         public int Id {
@@ -152,8 +125,8 @@ namespace RSD {
                 return false;
 
             if(process.Start()) {
-                ramCounter = new PerformanceCounter("Process", "Working Set", Process.ProcessName);
-                cpuCounter = new PerformanceCounter("Process", "% Processor Time", Process.ProcessName);
+                ramCounter = new PerformanceCounter("Process", "Working Set", Utility.GetProcessInstanceName(Process.Id));
+                cpuCounter = new PerformanceCounter("Process", "% Processor Time", Utility.GetProcessInstanceName(Process.Id));
                 performanceWarnings = new List<string>();
 
                 return true;
@@ -166,6 +139,8 @@ namespace RSD {
                 process.Kill();
                 process = null;
 
+                ramCounter.Dispose();
+                cpuCounter.Dispose();
                 ramCounter = null;
                 cpuCounter = null;
 
