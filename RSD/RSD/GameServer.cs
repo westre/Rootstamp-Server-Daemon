@@ -153,6 +153,11 @@ namespace RSD {
             foreach(GameServer gameServer in Server.GameServers) {
                 if(gameServer.Id == this.id) {
                     gameServer.Process = null;
+
+                    ramCounter.Dispose();
+                    cpuCounter.Dispose();
+                    ramCounter = null;
+                    cpuCounter = null;
                 }
             }
         }

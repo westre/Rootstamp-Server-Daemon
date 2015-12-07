@@ -41,21 +41,21 @@ namespace RSD {
         }
 
         private void OnPerformanceTick(GameServer server, double ram, double cpu) {
-            if(ram >= 200) {
-                server.PerformanceWarnings.Add("RAM usage too high: " + ram + " MB");
-                form.errorLog.Items.Add("RAM usage too high, Server " + server.Id + ", RAM (MB): " + ram + ", CPU: " + cpu);
+            if(ram >= 220) {
+                server.PerformanceWarnings.Add("[" + DateTime.Now + "]" + " RAM usage too high: " + ram + " MB");
+                form.errorLog.Items.Add("[" + DateTime.Now + "]" + "RAM usage too high, Server " + server.Id + ", RAM (MB): " + ram + ", CPU: " + cpu);
             }
 
             if (cpu >= 10) {
-                server.PerformanceWarnings.Add("CPU usage too high: " + cpu + " %");
-                form.errorLog.Items.Add("CPU usage too high, Server " + server.Id + ", RAM (MB): " + ram + ", CPU: " + cpu);
+                server.PerformanceWarnings.Add("[" + DateTime.Now + "]" + "CPU usage too high: " + cpu + " %");
+                form.errorLog.Items.Add("[" + DateTime.Now + "]" + "CPU usage too high, Server " + server.Id + ", RAM (MB): " + ram + ", CPU: " + cpu);
             }
 
             if(server.PerformanceWarnings.Count > 100) {
                 List<string> messages;
                 try {
                     if (server.Stop(out messages)) {
-                        form.errorLog.Items.Add("PerformanceWarnings OVER 100:: Stopped server: " + string.Join(",", messages.ToArray()));
+                        form.errorLog.Items.Add("[" + DateTime.Now + "]" + "PerformanceWarnings OVER 100:: Stopped server: " + string.Join(",", messages.ToArray()));
                     }
                 }
                 catch (Exception) { }
