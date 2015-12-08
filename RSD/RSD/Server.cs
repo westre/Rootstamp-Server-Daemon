@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -39,10 +40,31 @@ namespace RSD {
 
                 performanceMonitor = new PerformanceMonitor();
                 performanceMonitor.OnPerformanceTick += OnPerformanceTick;
+
+                string path = AppDomain.CurrentDomain.BaseDirectory + @"\exceptions.txt";
+                if(!File.Exists(path)) {
+                    File.CreateText(path);
+                }
+
+                AppDomain.CurrentDomain.UnhandledException += UnhandledException;
             }
             catch (Exception ex) {
                 form.Output("INIT ERROR: " + ex.Message);
             }         
+        }
+
+        private void UnhandledException(object sender, UnhandledExceptionEventArgs args) {
+            string path = AppDomain.CurrentDomain.BaseDirectory + @"\exceptions.txt";
+            Exception exception = (Exception)args.ExceptionObject;
+
+            if (File.Exists(path)) {
+                using (StreamWriter sw = File.AppendText(path)) {
+                    sw.WriteLine("------------------------------");
+                    sw.WriteLine(exception.Message);
+                    sw.WriteLine("Is Terminating: " + args.IsTerminating);
+                    sw.WriteLine("------------------------------");
+                }
+            }
         }
 
         private void OnPerformanceTick(GameServer server, double ram, double cpu) {

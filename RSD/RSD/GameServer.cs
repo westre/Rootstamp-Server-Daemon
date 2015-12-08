@@ -125,10 +125,14 @@ namespace RSD {
                 return false;
 
             if(process.Start()) {
+                performanceWarnings = new List<string>();
+
                 try {
-                    performanceWarnings = new List<string>();
-                    ramCounter = new PerformanceCounter("Process", "Working Set", Utility.GetProcessInstanceName(Process.Id));
-                    cpuCounter = new PerformanceCounter("Process", "% Processor Time", Utility.GetProcessInstanceName(Process.Id));
+                    string instanceName = Utility.GetProcessInstanceName(Process.Id);
+                    if(instanceName.Length > 0) {
+                        ramCounter = new PerformanceCounter("Process", "Working Set", instanceName);
+                        cpuCounter = new PerformanceCounter("Process", "% Processor Time", instanceName);
+                    }
                 }
                 catch (Exception) {
 
@@ -140,9 +144,6 @@ namespace RSD {
 
         protected bool StopProcess() {
             if(process != null) {
-                //ramCounter = null;
-                //cpuCounter = null;
-
                 process.Kill();
                 process = null;
                 return true;
