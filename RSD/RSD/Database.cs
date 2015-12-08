@@ -14,7 +14,7 @@ namespace RSD {
         public Database(Server server) {
             this.server = server;
 
-            connection = new MySqlConnection("Server=95.85.27.65;Database=rsd;Uid=westre;Pwd=holland17");            
+            connection = new MySqlConnection("Server=176.31.253.42;Database=rsd;Uid=rootstamp;Pwd=rootstamp1337");            
         }
 
         public List<GameServer> GetAllGameServers() {

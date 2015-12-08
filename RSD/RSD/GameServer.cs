@@ -125,10 +125,14 @@ namespace RSD {
                 return false;
 
             if(process.Start()) {
-                ramCounter = new PerformanceCounter("Process", "Working Set", Utility.GetProcessInstanceName(Process.Id));
-                cpuCounter = new PerformanceCounter("Process", "% Processor Time", Utility.GetProcessInstanceName(Process.Id));
-                performanceWarnings = new List<string>();
+                try {
+                    performanceWarnings = new List<string>();
+                    ramCounter = new PerformanceCounter("Process", "Working Set", Utility.GetProcessInstanceName(Process.Id));
+                    cpuCounter = new PerformanceCounter("Process", "% Processor Time", Utility.GetProcessInstanceName(Process.Id));
+                }
+                catch (Exception) {
 
+                }          
                 return true;
             }
             return false;
@@ -136,14 +140,11 @@ namespace RSD {
 
         protected bool StopProcess() {
             if(process != null) {
+                //ramCounter = null;
+                //cpuCounter = null;
+
                 process.Kill();
                 process = null;
-
-                ramCounter.Dispose();
-                cpuCounter.Dispose();
-                ramCounter = null;
-                cpuCounter = null;
-
                 return true;
             }            
             return false;
@@ -154,10 +155,8 @@ namespace RSD {
                 if(gameServer.Id == this.id) {
                     gameServer.Process = null;
 
-                    ramCounter.Dispose();
-                    cpuCounter.Dispose();
-                    ramCounter = null;
-                    cpuCounter = null;
+                    //ramCounter = null;
+                    //cpuCounter = null;
                 }
             }
         }

@@ -23,7 +23,7 @@ namespace RSD {
                 try {
                     Thread.Sleep(1000);
                     foreach(GameServer gameServer in Server.gameServers) {
-                        if (gameServer.IsActive() && gameServer.RamCounter != null && gameServer.CpuCounter != null) {
+                        if (gameServer != null && gameServer.IsActive() && gameServer.RamCounter != null && gameServer.CpuCounter != null) {
                             double ram = gameServer.RamCounter.NextValue();
                             double cpu = gameServer.CpuCounter.NextValue();
                             //Console.WriteLine("RAM: " + (ram / 1024 / 1024) + " MB; CPU: " + (cpu) + " %");

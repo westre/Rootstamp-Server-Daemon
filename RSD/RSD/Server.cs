@@ -24,41 +24,49 @@ namespace RSD {
         public Server(MainForm form) {
             this.form = form;
 
-            database = new Database(this);
+            try {
+                database = new Database(this);
 
-            gameServers = database.GetAllGameServers();
-            LinkProcesses(gameServers);
+                gameServers = database.GetAllGameServers();
+                LinkProcesses(gameServers);
 
-            registrationAutomation = new RegistrationAutomation(this);
+                registrationAutomation = new RegistrationAutomation(this);
 
-            form.InitializeGameServerPanel(gameServers);
+                form.InitializeGameServerPanel(gameServers);
 
-            socketListener = new SocketListener(this, 33333); // 33333
-            socketListener.SocketMessageReceived += OnMessageReceive;
+                socketListener = new SocketListener(this, 33333); // 33333
+                socketListener.SocketMessageReceived += OnMessageReceive;
 
-            performanceMonitor = new PerformanceMonitor();
-            performanceMonitor.OnPerformanceTick += OnPerformanceTick;
+                performanceMonitor = new PerformanceMonitor();
+                performanceMonitor.OnPerformanceTick += OnPerformanceTick;
+            }
+            catch (Exception ex) {
+                form.Output("INIT ERROR: " + ex.Message);
+            }         
         }
 
         private void OnPerformanceTick(GameServer server, double ram, double cpu) {
-            if(ram >= 220) {
-                server.PerformanceWarnings.Add("[" + DateTime.Now + "]" + " RAM usage too high: " + ram + " MB");
-                form.errorLog.Items.Add("[" + DateTime.Now + "]" + "RAM usage too high, Server " + server.Id + ", RAM (MB): " + ram + ", CPU: " + cpu);
-            }
+            try {
+                if (ram >= 220) {
+                    server.PerformanceWarnings.Add("[" + DateTime.Now + "]" + " RAM usage too high: " + ram + " MB");
+                    form.errorLog.Items.Add("[" + DateTime.Now + "]" + "RAM usage too high, Server " + server.Id + ", RAM (MB): " + ram + ", CPU: " + cpu);
+                }
 
-            if (cpu >= 10) {
-                server.PerformanceWarnings.Add("[" + DateTime.Now + "]" + "CPU usage too high: " + cpu + " %");
-                form.errorLog.Items.Add("[" + DateTime.Now + "]" + "CPU usage too high, Server " + server.Id + ", RAM (MB): " + ram + ", CPU: " + cpu);
-            }
+                if (cpu >= 10) {
+                    server.PerformanceWarnings.Add("[" + DateTime.Now + "]" + "CPU usage too high: " + cpu + " %");
+                    form.errorLog.Items.Add("[" + DateTime.Now + "]" + "CPU usage too high, Server " + server.Id + ", RAM (MB): " + ram + ", CPU: " + cpu);
+                }
 
-            if(server.PerformanceWarnings.Count > 100) {
-                List<string> messages;
-                try {
+                if(server.PerformanceWarnings.Count > 100) {
+                    List<string> messages;
+                
                     if (server.Stop(out messages)) {
                         form.errorLog.Items.Add("[" + DateTime.Now + "]" + "PerformanceWarnings OVER 100:: Stopped server: " + string.Join(",", messages.ToArray()));
-                    }
+                    }        
                 }
-                catch (Exception) { }
+            }
+            catch (Exception ex) {
+                form.Error("OnPerformanceTick:: " + ex.ToString());
             }
         }
 
